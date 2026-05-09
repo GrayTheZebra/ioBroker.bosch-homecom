@@ -1,5 +1,3 @@
-![Logo](admin/bosch-homecom.png)
-
 # ioBroker.bosch-homecom
 
 [![NPM version](https://img.shields.io/npm/v/iobroker.bosch-homecom.svg)](https://www.npmjs.com/package/iobroker.bosch-homecom)
