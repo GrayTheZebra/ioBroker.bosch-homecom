@@ -1,0 +1,83 @@
+{
+  "common": {
+    "name": "bosch-homecom",
+    "version": "0.1.0",
+    "news": {
+      "0.1.0": {
+        "en": "Initial release",
+        "de": "Erstver\u00f6ffentlichung"
+      }
+    },
+    "title": "Bosch HomeCom Easy",
+    "titleLang": {
+      "en": "Bosch HomeCom Easy",
+      "de": "Bosch HomeCom Easy"
+    },
+    "desc": {
+      "en": "ioBroker adapter for Bosch HomeCom Easy connected appliances",
+      "de": "ioBroker-Adapter f\u00fcr Bosch HomeCom Easy Ger\u00e4te"
+    },
+    "authors": [
+      "Your Name <your@email.com>"
+    ],
+    "keywords": [
+      "bosch",
+      "homecom",
+      "hvac",
+      "heating",
+      "climate"
+    ],
+    "main": "build/main.js",
+    "icon": "admin/bosch-homecom.png",
+    "license": "MIT",
+    "type": "climate-control",
+    "mode": "daemon",
+    "loglevel": "info",
+    "allowInit": true,
+    "connectionType": "cloud",
+    "dataSource": "poll",
+    "messagebox": true,
+    "adminUI": {
+      "config": "custom"
+    },
+    "dependencies": [
+      {
+        "js-controller": ">=5.0.0"
+      }
+    ],
+    "globalDependencies": [
+      {
+        "admin": ">=6.0.0"
+      }
+    ],
+    "supportCustoms": false,
+    "enabled": true
+  },
+  "native": {
+    "pollInterval": 300
+  },
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "name": "Connection status",
+        "type": "boolean",
+        "role": "indicator.connected",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    }
+  ]
+}

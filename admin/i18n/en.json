@@ -1,0 +1,18 @@
+{
+  "Bosch HomeCom Easy": "Bosch HomeCom Easy",
+  "Authentication": "Authentication",
+  "Settings": "Settings",
+  "Poll Interval (seconds)": "Poll Interval (seconds)",
+  "Open Authorization URL": "Open Authorization URL",
+  "Exchange Code & Connect": "Connect",
+  "Authorization Code (paste here, ends in -1)": "Authorization Code (paste here, ends in -1)",
+  "Connection status": "Connection status",
+  "Connected": "Connected",
+  "Not connected": "Not connected",
+  "Login successful": "Login successful",
+  "Login window opened": "Login window opened",
+  "Please paste the code": "Please paste the code",
+  "Code expired": "Code expired",
+  "Save": "Save",
+  "Saved": "Saved"
+}

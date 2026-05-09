@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Bosch HomeCom Easy</title>
+  <script type="text/javascript" src="../../lib/js/adapter-settings.js"></script>
+  <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #fafafa; color: #333; padding: 24px; }
+    h2 { font-size: 1.2rem; margin-bottom: 12px; color: #1565c0; }
+    .card { background: white; border-radius: 8px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.12); margin-bottom: 20px; max-width: 700px; }
+    .step { display: flex; gap: 12px; margin-bottom: 10px; }
+    .num { background: #1565c0; color: white; border-radius: 50%; width: 26px; height: 26px; min-width: 26px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; }
+    .step p { line-height: 1.6; font-size: 0.92rem; padding-top: 3px; }
+    code { background: #e8eaf6; padding: 1px 5px; border-radius: 3px; font-size: 0.85rem; }
+    input[type=text], input[type=number] { width: 100%; padding: 9px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.95rem; margin-top: 6px; }
+    input:focus { outline: none; border-color: #1565c0; }
+    label { font-size: 0.82rem; color: #666; display: block; margin-top: 14px; }
+    .btn { padding: 9px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.92rem; font-weight: 500; margin-top: 14px; margin-right: 8px; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .blue { background: #1565c0; color: white; }
+    .green { background: #2e7d32; color: white; }
+    .grey { background: #616161; color: white; }
+    .alert { padding: 10px 14px; border-radius: 6px; margin-top: 14px; font-size: 0.88rem; display: none; }
+    .ai { background: #e3f2fd; border: 1px solid #90caf9; color: #0d47a1; }
+    .as { background: #e8f5e9; border: 1px solid #81c784; color: #1b5e20; }
+    .ae { background: #ffebee; border: 1px solid #ef9a9a; color: #b71c1c; }
+    .status { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; margin-bottom: 16px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dg { background: #4caf50; } .dr { background: #f44336; } .dy { background: #9e9e9e; }
+    .spinner { display: inline-block; width: 13px; height: 13px; border: 2px solid #ccc; border-top-color: #1565c0; border-radius: 50%; animation: sp .7s linear infinite; vertical-align: middle; }
+    @keyframes sp { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div class="status">
+  <div class="dot dy" id="dot"></div>
+  <span id="stText">Verbindungsstatus wird geprüft…</span>
+</div>
+
+<div class="card">
+  <h2>Bosch SingleKey ID Anmeldung</h2>
+  <div class="step"><div class="num">1</div><p>Klicke auf <strong>„Login-URL öffnen"</strong> — die Bosch-Anmeldeseite öffnet sich in einem neuen Fenster. Nutze ein <strong>privates/Inkognito-Fenster</strong>.</p></div>
+  <div class="step"><div class="num">2</div><p>Melde dich mit deinen <strong>Bosch SingleKey ID</strong> Zugangsdaten an.</p></div>
+  <div class="step"><div class="num">3</div><p>Nach dem Login erscheint ein Redirect-Fehler — das ist <strong>normal</strong>. Öffne <strong>Entwicklertools (F12) → Netzwerk</strong>, filtere nach <code>pointt</code>, kopiere den <code>code</code>-Parameter (endet auf <code>-1</code>).</p></div>
+  <div class="step"><div class="num">4</div><p>Code unten einfügen und <strong>„Verbinden"</strong> klicken.</p></div>
+
+  <button class="btn blue" onclick="openAuthUrl()">Login-URL öffnen</button>
+
+  <label>Authorization Code (endet auf -1):</label>
+  <input type="text" id="codeInput" placeholder="Code hier einfügen…" autocomplete="off"
+    oninput="document.getElementById('btnConn').disabled=!this.value.trim()" />
+  <button class="btn green" id="btnConn" onclick="connect()" disabled>Verbinden</button>
+
+  <div class="alert ai" id="mi"></div>
+  <div class="alert as" id="ms"></div>
+  <div class="alert ae" id="me"></div>
+</div>
+
+<div class="card">
+  <h2>Einstellungen</h2>
+  <label>Abfrageintervall in Sekunden (min. 60):</label>
+  <input type="number" id="pollInterval" min="60" max="3600" value="300" style="max-width:180px" />
+  <br>
+  <button class="btn grey" onclick="saveNow()">Speichern</button>
+  <span id="savedMsg" style="display:none;margin-left:10px;color:#2e7d32;font-size:0.85rem">✓ Gespeichert</span>
+</div>
+
+<script>
+var _instance = 'bosch-homecom.0';
+var _socket = null;
+
+var AUTH_URL = 'https://singlekey-id.com/auth/connect/authorize?state=nKqS17oMAxqUsQpMznajIr&nonce=5yPvyTqMS3iPb4c8RfGJg1&code_challenge=Fc6eY3uMBJkFqa4VqcULuLuKC5Do70XMw7oa_Pxafw0&redirect_uri=com.bosch.tt.dashtt.pointt%3A%2F%2Fapp%2Flogin&client_id=762162C0-FA2D-4540-AE66-6489F189FADC&response_type=code&prompt=login&scope=openid+email+profile+offline_access+pointt.gateway.claiming+pointt.gateway.removal+pointt.gateway.list+pointt.gateway.users+pointt.gateway.resource.dashapp+pointt.castt.flow.token-exchange+bacon+hcc.tariff.read&code_challenge_method=S256&style_id=tt_bsch';
+
+// ── ioBroker required functions ───────────────────────────────────────────────
+function load(settings, onChange) {
+  if (settings && settings.pollInterval) {
+    document.getElementById('pollInterval').value = settings.pollInterval;
+  }
+  initSocket();
+}
+
+function save(callback) {
+  callback({ pollInterval: parseInt(document.getElementById('pollInterval').value) || 300 });
+}
+
+// ── Socket initialization ─────────────────────────────────────────────────────
+function initSocket() {
+  // Try multiple ways to get the socket
+  _socket = getSocket();
+  if (_socket) {
+    // Wait for connection then check status
+    if (_socket.connected) {
+      setTimeout(checkStatus, 500);
+    } else {
+      _socket.on('connect', function() { setTimeout(checkStatus, 500); });
+      setTimeout(checkStatus, 2000); // fallback
+    }
+  } else {
+    setTimeout(checkStatus, 1500);
+  }
+}
+
+function getSocket() {
+  // ioBroker Admin 6+ uses window.socket
+  if (window.socket) return window.socket;
+  // Sometimes in parent frame
+  if (window.parent && window.parent.socket) return window.parent.socket;
+  // Try io() directly
+  try {
+    if (typeof io !== 'undefined') {
+      var s = io.connect();
+      return s;
+    }
+  } catch(e) {}
+  return null;
+}
+
+// ── sendTo wrapper ────────────────────────────────────────────────────────────
+function doSendTo(cmd, data, cb) {
+  var sock = _socket || getSocket();
+
+  if (!sock) {
+    cb({ error: 'Keine Verbindung zum ioBroker Admin. Bitte Seite neu laden.' });
+    return;
+  }
+
+  // ioBroker Admin 6+ API
+  if (typeof sock.emit === 'function') {
+    sock.emit('sendTo', _instance, cmd, data, function(res) {
+      cb(res || { error: 'Keine Antwort vom Adapter' });
+    });
+    return;
+  }
+
+  cb({ error: 'Socket-Methode nicht verfügbar' });
+}
+
+// ── Actions ───────────────────────────────────────────────────────────────────
+function openAuthUrl() {
+  window.open(AUTH_URL, '_blank');
+  info('Login-Fenster geöffnet. Nach dem Login Code kopieren und unten einfügen.');
+  document.getElementById('btnConn').disabled = false;
+  document.getElementById('codeInput').focus();
+}
+
+function connect() {
+  var code = document.getElementById('codeInput').value.trim();
+  if (!code) { err('Bitte den Code einfügen.'); return; }
+
+  document.getElementById('btnConn').disabled = true;
+  info('<span class="spinner"></span> Verbinde mit Bosch…');
+
+  doSendTo('exchangeCode', { code: code }, function(res) {
+    if (res && res.success) {
+      document.getElementById('codeInput').value = '';
+      ok('✓ Verbunden! Der Adapter liest jetzt die Gerätedaten aus.');
+      setDot(true, 'Verbunden mit Bosch Cloud');
+    } else {
+      document.getElementById('btnConn').disabled = false;
+      var errMsg = (res && res.error) ? res.error : 'Keine Antwort — ist der Adapter gestartet?';
+      err('Fehler: ' + errMsg + '<br><small>Code abgelaufen? Bitte erneut „Login-URL öffnen" klicken.</small>');
+    }
+  });
+}
+
+function checkStatus() {
+  doSendTo('testConnection', {}, function(res) {
+    if (res && res.success) {
+      setDot(true, 'Verbunden — ' + (res.gatewayCount || 0) + ' Gateway(s)');
+    } else {
+      setDot(false, 'Nicht verbunden — Anmeldung erforderlich');
+    }
+  });
+}
+
+function saveNow() {
+  save(function(data) {
+    doSendTo('updateSettings', data, function() {});
+  });
+  var m = document.getElementById('savedMsg');
+  m.style.display = 'inline';
+  setTimeout(function() { m.style.display = 'none'; }, 2000);
+}
+
+// ── UI helpers ────────────────────────────────────────────────────────────────
+function setDot(on, t) {
+  document.getElementById('dot').className = 'dot ' + (on ? 'dg' : 'dr');
+  document.getElementById('stText').textContent = t;
+}
+function info(h) { show('mi', h); hide('ms'); hide('me'); }
+function ok(h)   { show('ms', h); hide('mi'); hide('me'); }
+function err(h)  { show('me', h); hide('mi'); hide('ms'); }
+function show(id, h) { var e = document.getElementById(id); e.innerHTML = h; e.style.display = 'block'; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+</script>
+</body>
+</html>
