@@ -1,18 +1,10 @@
 {
-  "Bosch HomeCom Easy": "Bosch HomeCom Easy",
   "Authentication": "Authentifizierung",
   "Settings": "Einstellungen",
+  "SingleKey ID Username (E-Mail)": "SingleKey ID Benutzername (E-Mail)",
+  "Authorization Code (paste here, ends in -1)": "Autorisierungscode (hier einfügen, endet auf -1)",
   "Poll Interval (seconds)": "Abfrageintervall (Sekunden)",
-  "Open Authorization URL": "Login-URL öffnen",
-  "Exchange Code & Connect": "Verbinden",
-  "Authorization Code (paste here, ends in -1)": "Autorisierungscode (endet auf -1)",
-  "Connection status": "Verbindungsstatus",
-  "Connected": "Verbunden",
-  "Not connected": "Nicht verbunden",
-  "Login successful": "Anmeldung erfolgreich",
-  "Login window opened": "Login-Fenster geöffnet",
-  "Please paste the code": "Bitte Code einfügen",
-  "Code expired": "Code abgelaufen",
-  "Save": "Speichern",
-  "Saved": "Gespeichert"
+  "Open Authorization URL": "Autorisierungs-URL öffnen",
+  "Exchange Code & Connect": "Code tauschen und verbinden",
+  "Test Connection": "Verbindung testen"
 }
