@@ -5,49 +5,86 @@
     "news": {
       "0.1.0": {
         "en": "Initial release",
-        "de": "Erstver\u00f6ffentlichung"
+        "de": "Initial release",
+        "ru": "Initial release",
+        "pt": "Initial release",
+        "nl": "Initial release",
+        "fr": "Initial release",
+        "it": "Initial release",
+        "es": "Initial release",
+        "pl": "Initial release",
+        "uk": "Initial release",
+        "zh-cn": "Initial release"
       }
     },
-    "title": "Bosch HomeCom Easy",
     "titleLang": {
       "en": "Bosch HomeCom Easy",
-      "de": "Bosch HomeCom Easy"
+      "de": "Bosch HomeCom Easy",
+      "ru": "Bosch HomeCom Easy",
+      "pt": "Bosch HomeCom Easy",
+      "nl": "Bosch HomeCom Easy",
+      "fr": "Bosch HomeCom Easy",
+      "it": "Bosch HomeCom Easy",
+      "es": "Bosch HomeCom Easy",
+      "pl": "Bosch HomeCom Easy",
+      "uk": "Bosch HomeCom Easy",
+      "zh-cn": "Bosch HomeCom Easy"
     },
     "desc": {
-      "en": "ioBroker adapter for Bosch HomeCom Easy connected appliances",
-      "de": "ioBroker-Adapter f\u00fcr Bosch HomeCom Easy Ger\u00e4te"
+      "en": "ioBroker adapter for Bosch HomeCom Easy compatible devices",
+      "de": "ioBroker adapter for Bosch HomeCom Easy compatible devices",
+      "ru": "ioBroker adapter for Bosch HomeCom Easy compatible devices",
+      "pt": "ioBroker adapter for Bosch HomeCom Easy compatible devices",
+      "nl": "ioBroker adapter for Bosch HomeCom Easy compatible devices",
+      "fr": "ioBroker adapter for Bosch HomeCom Easy compatible devices",
+      "it": "ioBroker adapter for Bosch HomeCom Easy compatible devices",
+      "es": "ioBroker adapter for Bosch HomeCom Easy compatible devices",
+      "pl": "ioBroker adapter for Bosch HomeCom Easy compatible devices",
+      "uk": "ioBroker adapter for Bosch HomeCom Easy compatible devices",
+      "zh-cn": "ioBroker adapter for Bosch HomeCom Easy compatible devices"
     },
     "authors": [
-      "Your Name <your@email.com>"
+      "GrayTheZebra <github@graythezebra.de>"
     ],
     "keywords": [
       "bosch",
+      "buderus",
+      "junkers",
       "homecom",
+      "homecom-easy",
       "hvac",
       "heating",
-      "climate"
+      "climate",
+      "heat-pump",
+      "water-heater",
+      "smart-home"
     ],
-    "main": "build/main.js",
     "icon": "admin/bosch-homecom.png",
-    "license": "MIT",
+    "extIcon": "https://raw.githubusercontent.com/GrayTheZebra/ioBroker.bosch-homecom/main/admin/bosch-homecom.png",
+    "licenseInformation": {
+      "type": "free",
+      "license": "MIT"
+    },
+    "platform": "Javascript/Node.js",
+    "tier": 3,
     "type": "climate-control",
     "mode": "daemon",
+    "compact": false,
     "loglevel": "info",
-    "allowInit": true,
     "connectionType": "cloud",
     "dataSource": "poll",
     "messagebox": true,
     "adminUI": {
-      "config": "custom"
+      "config": "html"
     },
     "dependencies": [
       {
-        "js-controller": ">=5.0.0"
+        "js-controller": ">=6.0.11"
       }
     ],
     "globalDependencies": [
       {
-        "admin": ">=6.0.0"
+        "admin": ">=7.6.17"
       }
     ],
     "supportCustoms": false,

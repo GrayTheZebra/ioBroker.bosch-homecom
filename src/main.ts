@@ -157,7 +157,7 @@ class BoschHomecom extends utils.Adapter {
           return;
         }
         if (!verifier) {
-          this.sendTo(obj.from, obj.command, { error: 'No PKCE verifier. Please click "Login-URL öffnen" first.' }, obj.callback);
+          this.sendTo(obj.from, obj.command, { error: 'No PKCE verifier. Please click "Open login URL" first.' }, obj.callback);
           return;
         }
 
