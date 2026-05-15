@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import axios from 'axios';
 import type { TokenResponse, StoredTokens } from './types';
 

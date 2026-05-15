@@ -7,8 +7,8 @@
  * The code expires within seconds!
  */
 
-const https = require('https');
-const querystring = require('querystring');
+const https = require('node:https');
+const querystring = require('node:querystring');
 
 const CLIENT_ID = '762162C0-FA2D-4540-AE66-6489F189FADC';
 const REDIRECT_URI = 'com.bosch.tt.dashtt.pointt://app/login';

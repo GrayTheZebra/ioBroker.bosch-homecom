@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthManager = void 0;
-const crypto_1 = __importDefault(require("crypto"));
+const node_crypto_1 = __importDefault(require("node:crypto"));
 const axios_1 = __importDefault(require("axios"));
 // ─── Bosch SingleKey ID OAuth2 constants ─────────────────────────────────────
 const AUTH_BASE = 'https://singlekey-id.com/auth/connect';
@@ -43,8 +43,8 @@ class AuthManager {
     // ─── Step 1: generate authorization URL with fixed PKCE challenge ───────────
     getAuthorizationUrl() {
         const params = new URLSearchParams({
-            state: crypto_1.default.randomBytes(16).toString('base64url'),
-            nonce: crypto_1.default.randomBytes(16).toString('base64url'),
+            state: node_crypto_1.default.randomBytes(16).toString('base64url'),
+            nonce: node_crypto_1.default.randomBytes(16).toString('base64url'),
             code_challenge: OAUTH_BROWSER_CHALLENGE,
             code_challenge_method: 'S256',
             redirect_uri: REDIRECT_URI,
@@ -121,8 +121,8 @@ class AuthManager {
     }
     // ─── Utility: generate fresh PKCE pair (for future use) ─────────────────
     static generatePkce() {
-        const verifier = crypto_1.default.randomBytes(32).toString('base64url');
-        const challenge = crypto_1.default.createHash('sha256').update(verifier).digest('base64url');
+        const verifier = node_crypto_1.default.randomBytes(32).toString('base64url');
+        const challenge = node_crypto_1.default.createHash('sha256').update(verifier).digest('base64url');
         return { verifier, challenge };
     }
 }

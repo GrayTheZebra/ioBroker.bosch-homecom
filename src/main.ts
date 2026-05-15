@@ -1,6 +1,6 @@
 import * as utils from '@iobroker/adapter-core';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { AuthManager } from './lib/auth';
 import { ApiClient } from './lib/api';
 import { DeviceManager } from './lib/deviceManager';

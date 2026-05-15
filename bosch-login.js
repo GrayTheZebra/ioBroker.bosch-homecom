@@ -9,11 +9,11 @@
  * Example: node bosch-login.js bosch-homecom.0
  */
 
-const crypto = require('crypto');
-const https = require('https');
-const querystring = require('querystring');
-const readline = require('readline');
-const { execSync } = require('child_process');
+const crypto = require('node:crypto');
+const https = require('node:https');
+const querystring = require('node:querystring');
+const readline = require('node:readline');
+const { execSync } = require('node:child_process');
 
 const INSTANCE = process.argv[2] || 'bosch-homecom.0';
 const CLIENT_ID = '762162C0-FA2D-4540-AE66-6489F189FADC';
