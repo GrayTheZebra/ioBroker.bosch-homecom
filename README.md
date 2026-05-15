@@ -5,169 +5,173 @@
 [![Build Status](https://github.com/GrayTheZebra/ioBroker.bosch-homecom/actions/workflows/build.yml/badge.svg)](https://github.com/GrayTheZebra/ioBroker.bosch-homecom/actions)
 ![GitHub license](https://img.shields.io/github/license/GrayTheZebra/ioBroker.bosch-homecom)
 
-**ioBroker-Adapter für Bosch HomeCom Easy Geräte.**
+ioBroker adapter for Bosch HomeCom Easy compatible devices.
 
-Verbinde deine Bosch-, Buderus- oder Junkers-Geräte über die Bosch-Cloud-API mit ioBroker. Alle Datenpunkte werden automatisch erkannt und als ioBroker-Objekte angelegt.
+This adapter connects Bosch, Buderus and Junkers devices to ioBroker by using the Bosch cloud API. Available resources are detected automatically and created as ioBroker objects and states.
 
-> ⚠️ **Frühe Testversion:** Dieser Adapter ist aktuell nicht offiziell in ioBroker gelistet und befindet sich noch in der Erprobung. Bitte nur auf Testsystemen oder mit aktuellem Backup verwenden.
+> [!WARNING]
+> This adapter is an early test version. It is not listed in the official ioBroker repository yet. Please use it only on test systems or with a recent backup of your ioBroker installation.
 
-> ⚠️ Dieser Adapter ist nicht mit Bosch verbunden. Er nutzt dieselbe undokumentierte API wie die offizielle HomeCom Easy App.
+> [!WARNING]
+> This adapter is not affiliated with Bosch, Buderus or Junkers. It uses the same undocumented API that is used by the official Bosch HomeCom Easy app.
 
 ---
 
-## Unterstützte Geräte
+## Supported devices
 
-| Gerätetyp     | Beispiele                                                |
-| ------------- | -------------------------------------------------------- |
-| **wddw2**     | Tronic 6000T, Tronic 8000T (Durchlauferhitzer)           |
-| **RAC**       | Climate Class 5000i, 6000i (Split-Klimaanlagen)          |
-| **K30 / K40** | Compress 7000i, Buderus Logatherm WLW 186i (Wärmepumpen) |
-| **ICOM**      | IVT Aero Series                                          |
-| **RRC2**      | CT200, CT100 Thermostate                                 |
-| **Commodule** | Wallbox 7000i (Wallboxen)                                |
+| Device type   | Examples                                                        |
+| ------------- | --------------------------------------------------------------- |
+| **wddw2**     | Tronic 6000T, Tronic 8000T water heaters                        |
+| **RAC**       | Climate Class 5000i, Climate Class 6000i split air conditioners |
+| **K30 / K40** | Compress 7000i, Buderus Logatherm WLW 186i heat pumps           |
+| **ICOM**      | IVT Aero Series                                                 |
+| **RRC2**      | CT200, CT100 thermostats                                        |
+| **Commodule** | Wallbox 7000i wallboxes                                         |
 
-> ❌ Midea-basierte Klimageräte und Luftreiniger werden **nicht unterstützt**.
+> [!NOTE]
+> Midea-based air conditioners and air purifiers are not supported.
 
-**Voraussetzung:** Das Gerät muss vor der Nutzung des Adapters in der offiziellen **Bosch HomeCom Easy** Smartphone-App eingerichtet und funktionstüchtig sein.
+The device must be set up and working in the official **Bosch HomeCom Easy** smartphone app before it can be used with this adapter.
 
 ---
 
 ## Installation
 
-> ⚠️ **Hinweis:** Dieser Adapter befindet sich aktuell in einer frühen Testphase.
-> Bitte nur installieren, wenn du weißt, wie du ioBroker-Adapter aus GitHub testweise installierst und im Zweifel ein Backup deiner ioBroker-Installation hast.
+> [!IMPORTANT]
+> This adapter is currently intended for testing. Do not install it on a productive ioBroker system unless you know how to recover your installation.
 
-### Installation über ioBroker Admin
+### Installation via ioBroker Admin
 
-Die empfohlene Testinstallation erfolgt über den ioBroker Admin:
+The recommended test installation is done via ioBroker Admin:
 
-1. ioBroker Admin öffnen
-2. Zum Reiter **Adapter** wechseln
-3. Auf das **GitHub-Symbol** klicken
-   *(Adapter aus eigener Quelle / URL installieren)*
-4. Folgende URL einfügen:
+1. Open ioBroker Admin
+2. Go to the **Adapters** tab
+3. Click the **GitHub icon** / install from custom URL
+4. Enter the following URL:
 
 ```text
 https://github.com/GrayTheZebra/ioBroker.bosch-homecom
 ```
 
-5. Installation starten
-6. Danach eine Instanz des Adapters anlegen
-7. Adapter konfigurieren und den Login-Flow durchführen
+5. Start the installation
+6. Create an adapter instance
+7. Open the adapter configuration and complete the login flow
+
+### Manual installation
+
+Manual installation inside `/opt/iobroker/node_modules` is **not recommended** and is intentionally not documented here.
+
+Please do not run manual `npm install`, build or linking commands inside a productive ioBroker installation unless you are developing the adapter and know exactly what you are doing.
+
+For normal testing, use the installation through ioBroker Admin.
 
 ---
 
-### Wichtiger Hinweis zur manuellen Installation
+## Configuration and login
 
-Eine manuelle Installation direkt in `/opt/iobroker/node_modules` wird **nicht empfohlen**.
+Direct login with username and password is not possible because the Bosch SingleKey ID login page requires a CAPTCHA. Authentication therefore uses a one-time manual authorization code flow.
 
-Bitte keine manuellen `npm install`- oder Build-Versuche innerhalb der produktiven ioBroker-Installation durchführen, sofern du nicht gezielt am Adapter entwickelst und weißt, was du tust.
+This step is only required once. After the initial login, the adapter refreshes the token automatically.
 
-Für normale Tests bitte ausschließlich die Installation über den ioBroker Admin verwenden.
+### Step-by-step login
 
----
+1. Open the adapter configuration in ioBroker Admin
+2. Click **Open login URL** — the Bosch login page opens in a new browser tab
+3. Open the URL in a **private/incognito browser window**
+4. Log in with your **Bosch SingleKey ID** credentials
+5. After login, a redirect error may be shown — this is expected
+6. Open the browser developer tools with **F12** and switch to the **Network** tab
+7. Filter for `pointt` or search for a failed request that contains `code=` in the URL
+8. Copy the value of the `code` parameter — it usually ends with `-1`
+9. Paste the code into the **Authorization Code** field in the adapter configuration
+10. Click **Connect**
 
-## Konfiguration & Anmeldung
+The adapter exchanges the authorization code for tokens and stores them locally. The login is then complete.
 
-Eine direkte Anmeldung mit Benutzername und Passwort ist nicht möglich, da Bosch auf der SingleKey-ID-Anmeldeseite einen CAPTCHA erzwingt. Die Authentifizierung erfordert einen einmaligen manuellen Autorisierungscode-Flow.
-
-**Dieser Schritt ist nur einmalig notwendig.** Danach erneuert der Adapter den Token automatisch.
-
-### Schritt für Schritt
-
-1. Adapterkonfiguration in ioBroker Admin öffnen
-2. Auf **„Login-URL öffnen"** klicken — die Bosch-Anmeldeseite öffnet sich in einem neuen Tab
-3. URL in einem **privaten/Inkognito-Fenster** öffnen
-4. Mit den **Bosch SingleKey ID** Zugangsdaten anmelden
-5. Nach der Anmeldung erscheint ein Redirect-Fehler — das ist **erwartet und normal**
-6. **Entwicklertools (F12)** öffnen → Reiter **Netzwerk**
-7. Nach `pointt` filtern oder einen fehlgeschlagenen Request mit `code=` in der URL suchen
-8. Den Wert des `code`-Parameters kopieren — er **endet auf `-1`**
-9. Code in das Feld **„Authorization Code"** in der Adapterkonfiguration einfügen
-10. Auf **„Verbinden"** klicken
-
-Der Adapter tauscht den Code gegen Tokens und speichert diese lokal. Die Anmeldung ist abgeschlossen.
-
-> ⏱️ Der Code verfällt innerhalb von Sekunden — die Adapterkonfiguration und das Eingabefeld sollten **vor** dem Browser-Login bereits geöffnet sein.
+> [!IMPORTANT]
+> The authorization code expires within a few seconds. The adapter configuration and the input field should already be open before starting the browser login.
 
 ---
 
-## Objektstruktur
+## Object structure
 
-Nach erfolgreicher Anmeldung werden alle Gerätedatenpunkte automatisch erkannt und angelegt:
+After a successful login, all detected device resources are created automatically:
 
 ```text
 bosch-homecom.0
 ├── info
-│   └── connection                         ← Cloud-Verbindungsstatus (boolean)
-└── <geräteId>                             ← Deine Gateway-/Geräte-ID
+│   └── connection                         ← cloud connection status (boolean)
+└── <deviceId>                             ← gateway or device ID
     ├── info
-    │   ├── gatewayId                      ← Geräte-ID
-    │   ├── deviceType                     ← Gerätetyp (wddw2, RAC, ...)
-    │   ├── firmwareVersion                ← Aktuelle Firmware
-    │   └── status                         ← Online-Status
+    │   ├── gatewayId                      ← device ID
+    │   ├── deviceType                     ← device type (wddw2, RAC, ...)
+    │   ├── firmwareVersion                ← current firmware version
+    │   └── status                         ← online status
     └── resources
-        └── <api.pfad.struktur>            ← Alle erkannten Datenpunkte
+        └── <api.path.structure>           ← detected resources
 ```
 
-### Beispiel (wddw2 Durchlauferhitzer)
+### Example for a wddw2 water heater
 
 ```text
 resources
-├── dhwCircuits.dhw1.operationMode         ← S/L: manual/handWash/shower/bath/dishWash
-├── dhwCircuits.dhw1.inletTemperature      ← L:   Einlauftemperatur (°C)
-├── dhwCircuits.dhw1.outletTemperature     ← L:   Auslauftemperatur (°C)
-├── dhwCircuits.dhw1.temperatureLevels.*   ← Temperatursollwerte je Betriebsmodus
-├── dhwCircuits.waterTotalConsumption      ← L:   Gesamtwasserverbrauch (l)
-└── gateway.versionFirmware                ← L:   Firmware-Version
+├── dhwCircuits.dhw1.operationMode         ← R/W: manual/handWash/shower/bath/dishWash
+├── dhwCircuits.dhw1.inletTemperature      ← R:   inlet temperature (°C)
+├── dhwCircuits.dhw1.outletTemperature     ← R:   outlet temperature (°C)
+├── dhwCircuits.dhw1.temperatureLevels.*   ← target temperatures per operation mode
+├── dhwCircuits.waterTotalConsumption      ← R:   total water consumption (l)
+└── gateway.versionFirmware                ← R:   firmware version
 ```
 
-**L** = lesbar, **S/L** = schreib- und lesbar
+**R** = readable, **R/W** = readable and writable
 
 ---
 
-## Einstellungen
+## Settings
 
-| Einstellung          | Standard | Beschreibung                                                            |
-| -------------------- | -------- | ----------------------------------------------------------------------- |
-| **Abfrageintervall** | 300 s    | Wie oft Gerätedaten aus der Bosch-Cloud abgerufen werden. Minimum: 60 s |
-
----
-
-## Token-Verwaltung
-
-* Tokens werden in `tokens.json` im Adapterverzeichnis gespeichert
-* Der Access Token wird automatisch erneuert wenn er abläuft
-* Alle 12 Stunden erfolgt eine vorausschauende Erneuerung
-* Falls der Refresh Token abläuft oder ungültig wird, muss der Login-Flow in der Adapterkonfiguration erneut durchgeführt werden
+| Setting              | Default | Description                                                              |
+| -------------------- | ------: | ------------------------------------------------------------------------ |
+| **Polling interval** |   300 s | Interval for polling device data from the Bosch cloud API. Minimum: 60 s |
 
 ---
 
-## Fehlerbehebung
+## Token handling
 
-### „No tokens available"
-
-Der Adapter wurde noch nicht authentifiziert. Die Adapterkonfiguration öffnen und den Login-Flow durchführen.
-
-### „Token refresh failed: invalid_grant"
-
-Der Refresh Token ist abgelaufen oder wurde ungültig gemacht, zum Beispiel durch Anmeldung in einer anderen App. Den Login-Flow erneut durchführen.
-
-### „Connection failed" / Keine Objekte angelegt
-
-* Prüfen, ob das Gerät in der HomeCom Easy App online ist
-* ioBroker-Log auf Details prüfen, Log-Level `debug` empfohlen
-* Sicherstellen, dass die Adapterinstanz läuft, grüner Indikator im Admin
-
-### Autorisierungscode verfällt zu schnell
-
-Der Code ist nur wenige Sekunden gültig. Die Adapterkonfiguration und das Eingabefeld sollten **bereits geöffnet und bereit** sein, bevor der Login im Browser gestartet wird.
+* Tokens are stored in `tokens.json` in the adapter directory
+* The access token is refreshed automatically when it expires
+* A proactive refresh is performed every 12 hours
+* If the refresh token expires or becomes invalid, the login flow must be repeated in the adapter configuration
 
 ---
 
-## Entwicklung
+## Troubleshooting
 
-Wenn du am Adapter selbst entwickeln möchtest, klone das Repository in ein separates Entwicklungsverzeichnis außerhalb von `/opt/iobroker`:
+### `No tokens available`
+
+The adapter has not been authenticated yet. Open the adapter configuration and complete the login flow.
+
+### `Token refresh failed: invalid_grant`
+
+The refresh token has expired or has been invalidated, for example by another login. Repeat the login flow in the adapter configuration.
+
+### `Connection failed` / no objects created
+
+* Check whether the device is online in the HomeCom Easy app
+* Check the ioBroker log for details
+* Use log level `debug` for more detailed output
+* Make sure that the adapter instance is running
+
+### Authorization code expires too quickly
+
+The authorization code is only valid for a few seconds. Open the adapter configuration and prepare the authorization code input field before starting the browser login.
+
+---
+
+## Development
+
+Development should be done in a separate working directory outside of `/opt/iobroker`.
+
+General development workflow:
 
 ```bash
 git clone https://github.com/GrayTheZebra/ioBroker.bosch-homecom
@@ -176,49 +180,43 @@ npm install
 npm run build
 ```
 
-Für die Entwicklung kann außerdem der Watch-Modus genutzt werden:
+Watch mode for development:
 
 ```bash
 npm run watch
 ```
 
-Dieses Setup ist nur für die Entwicklung gedacht und ersetzt nicht die empfohlene Testinstallation über ioBroker Admin.
+These commands are intended for adapter development only. They are not installation instructions for end users and should not be executed inside a productive ioBroker installation.
 
-### Projektstruktur
+### Project structure
 
 ```text
 src/
-├── main.ts              # Adapter-Einstiegspunkt, Lifecycle, Polling
+├── main.ts              # adapter entry point, lifecycle, polling
 └── lib/
-    ├── auth.ts          # OAuth2 + PKCE Token-Verwaltung
-    ├── api.ts           # REST-Client für pointt-api
-    ├── deviceManager.ts # ioBroker Objekt-/State-Verwaltung
-    └── types.ts         # TypeScript-Interfaces
+    ├── auth.ts          # OAuth2 and PKCE token handling
+    ├── api.ts           # REST client for the pointt API
+    ├── deviceManager.ts # ioBroker object and state handling
+    └── types.ts         # TypeScript interfaces
 admin/
-├── index.html           # Eigene Admin-UI (Login-Flow + Einstellungen)
-└── i18n/                # Übersetzungen
+├── index.html           # custom admin UI for login flow and settings
+└── i18n/                # translations
 ```
 
 ---
 
-## Entstehung
+## Background
 
-Dieser Adapter wurde mit Unterstützung von [Claude](https://claude.ai) (KI-Assistent von Anthropic) entwickelt. Die gesamte Entwicklung — von der Analyse der Bosch-API über die Implementierung des OAuth2-Flows bis hin zur ioBroker-Integration — entstand in einem iterativen Dialog zwischen Entwickler und KI.
+This adapter was developed with support from [Claude](https://claude.ai), an AI assistant by Anthropic. The development process, including analysis of the Bosch API, implementation of the OAuth2 flow and ioBroker integration, was done iteratively by the developer with AI assistance.
 
-Der Quellcode der [homecom_alt](https://github.com/serbanb11/homecom_alt)-Bibliothek von serbanb11 lieferte die entscheidenden Erkenntnisse über den Authentifizierungsablauf und die API-Endpunkte.
-
----
-
-## Danksagungen
-
-* Authentifizierungs-Flow basiert auf [homecom_alt](https://github.com/serbanb11/homecom_alt) von serbanb11
-* Home Assistant Integration: [bosch-homecom-hass](https://github.com/serbanb11/bosch-homecom-hass)
+The source code of the [homecom_alt](https://github.com/serbanb11/homecom_alt) library by serbanb11 provided the key information about the authentication flow and API endpoints.
 
 ---
 
-## Lizenz
+## Acknowledgements
 
-MIT © 2026 GrayTheZebra
+* Authentication flow based on [homecom_alt](https://github.com/serbanb11/homecom_alt) by serbanb11
+* Home Assistant integration: [bosch-homecom-hass](https://github.com/serbanb11/bosch-homecom-hass)
 
 ---
 
@@ -226,8 +224,14 @@ MIT © 2026 GrayTheZebra
 
 ### 0.1.0 (2026-05-09)
 
-* Erstveröffentlichung
-* Automatische Ressourcenerkennung für alle Gerätetypen
-* OAuth2 + PKCE Authentifizierung über Admin-UI
-* Unterstützung für schreibbare Datenpunkte
-* Automatische Token-Erneuerung
+* Initial release
+* Automatic resource detection for all detected device types
+* OAuth2 and PKCE authentication through the admin UI
+* Support for writable resources
+* Automatic token refresh
+
+---
+
+## License
+
+MIT © 2026 GrayTheZebra
