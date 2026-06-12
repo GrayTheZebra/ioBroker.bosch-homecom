@@ -43,7 +43,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@iobroker/adapter-core": "^3.3.2",
+    "@iobroker/adapter-core": "^3.4.1",
     "axios": "^1.6.0"
   },
   "devDependencies": {
