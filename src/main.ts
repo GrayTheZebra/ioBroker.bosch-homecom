@@ -150,14 +150,10 @@ class BoschHomecom extends utils.Adapter {
       case 'exchangeCode': {
         const msg = obj.message as { code?: string; verifier?: string };
         const code = msg?.code?.trim();
-        const verifier = msg?.verifier || this.pkceVerifier || '';
+        const verifier = msg?.verifier || this.pkceVerifier || undefined;
 
         if (!code) {
           this.sendTo(obj.from, obj.command, { error: 'No code provided' }, obj.callback);
-          return;
-        }
-        if (!verifier) {
-          this.sendTo(obj.from, obj.command, { error: 'No PKCE verifier. Please click "Open login URL" first.' }, obj.callback);
           return;
         }
 
