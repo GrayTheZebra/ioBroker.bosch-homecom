@@ -47,6 +47,7 @@
       "GrayTheZebra <github@graythezebra.de>"
     ],
     "keywords": [
+      "ioBroker",
       "bosch",
       "buderus",
       "junkers",
@@ -59,7 +60,7 @@
       "water-heater",
       "smart-home"
     ],
-    "icon": "admin/bosch-homecom.png",
+    "icon": "bosch-homecom.png",
     "extIcon": "https://raw.githubusercontent.com/GrayTheZebra/ioBroker.bosch-homecom/main/admin/bosch-homecom.png",
     "licenseInformation": {
       "type": "free",
@@ -84,7 +85,7 @@
     ],
     "globalDependencies": [
       {
-        "admin": ">=7.6.17"
+        "admin": ">=7.6.20"
       }
     ],
     "supportCustoms": false,
