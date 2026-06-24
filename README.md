@@ -232,6 +232,8 @@ The source code of the [homecom_alt](https://github.com/serbanb11/homecom_alt) l
 
 ---
 
+[Older changelogs can be found there](CHANGELOG_OLD.md)
+
 ## License
 
 MIT © 2026 GrayTheZebra
