@@ -222,6 +222,10 @@ The source code of the [homecom_alt](https://github.com/serbanb11/homecom_alt) l
 
 ## Changelog
 
+
+### **WORK IN PROGRESS**
+- (ioBroker-Bot) Adapter requires admin >= 7.8.23 now.
+
 ### 0.1.0 (2026-05-09)
 
 * Initial release
