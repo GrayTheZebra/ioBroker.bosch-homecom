@@ -2,7 +2,7 @@
 
 [![NPM version](https://img.shields.io/npm/v/iobroker.bosch-homecom.svg)](https://www.npmjs.com/package/iobroker.bosch-homecom)
 [![Downloads](https://img.shields.io/npm/dm/iobroker.bosch-homecom.svg)](https://www.npmjs.com/package/iobroker.bosch-homecom)
-[![Build Status](https://github.com/GrayTheZebra/ioBroker.bosch-homecom/actions/workflows/build.yml/badge.svg)](https://github.com/GrayTheZebra/ioBroker.bosch-homecom/actions)
+[![Test and Release](https://github.com/GrayTheZebra/ioBroker.bosch-homecom/actions/workflows/test-and-release.yml/badge.svg)](https://github.com/GrayTheZebra/ioBroker.bosch-homecom/actions/workflows/test-and-release.yml)
 ![GitHub license](https://img.shields.io/github/license/GrayTheZebra/ioBroker.bosch-homecom)
 
 ioBroker adapter for Bosch HomeCom Easy compatible devices.
@@ -37,33 +37,19 @@ The device must be set up and working in the official **Bosch HomeCom Easy** sma
 
 ## Installation
 
+The adapter should be installed through the official ioBroker Admin interface once it is available in the ioBroker adapter repository.
+
 > [!IMPORTANT]
 > This adapter is currently intended for testing. Do not install it on a productive ioBroker system unless you know how to recover your installation.
 
-### Installation via ioBroker Admin
+After installation:
 
-The recommended test installation is done via ioBroker Admin:
+1. Create an adapter instance
+2. Open the adapter configuration
+3. Complete the login flow
+4. Start the adapter instance
 
-1. Open ioBroker Admin
-2. Go to the **Adapters** tab
-3. Click the **GitHub icon** / install from custom URL
-4. Enter the following URL:
-
-```text
-https://github.com/GrayTheZebra/ioBroker.bosch-homecom
-```
-
-5. Start the installation
-6. Create an adapter instance
-7. Open the adapter configuration and complete the login flow
-
-### Manual installation
-
-Manual installation inside `/opt/iobroker/node_modules` is **not recommended** and is intentionally not documented here.
-
-Please do not run manual `npm install`, build or linking commands inside a productive ioBroker installation unless you are developing the adapter and know exactly what you are doing.
-
-For normal testing, use the installation through ioBroker Admin.
+Manual installation inside `/opt/iobroker/node_modules` is not recommended.
 
 ---
 
@@ -171,22 +157,9 @@ The authorization code is only valid for a few seconds. Open the adapter configu
 
 Development should be done in a separate working directory outside of `/opt/iobroker`.
 
-General development workflow:
+This repository contains a TypeScript-based ioBroker adapter. The source files are located in `src/`, the admin UI is located in `admin/`, and the compiled adapter output is generated into `build/`.
 
-```bash
-git clone https://github.com/GrayTheZebra/ioBroker.bosch-homecom
-cd ioBroker.bosch-homecom
-npm install
-npm run build
-```
-
-Watch mode for development:
-
-```bash
-npm run watch
-```
-
-These commands are intended for adapter development only. They are not installation instructions for end users and should not be executed inside a productive ioBroker installation.
+Development commands are intentionally not documented as end-user installation instructions. Contributors should use the standard ioBroker adapter development workflow for TypeScript adapters.
 
 ### Project structure
 
@@ -234,4 +207,6 @@ The source code of the [homecom_alt](https://github.com/serbanb11/homecom_alt) l
 
 ## License
 
-MIT © 2026 GrayTheZebra
+MIT License
+
+Copyright (c) 2026 GrayTheZebra

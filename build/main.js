@@ -43,8 +43,6 @@ const TOKEN_FILE = path.join(__dirname, '..', 'tokens.json');
 class BoschHomecom extends utils.Adapter {
     constructor(options = {}) {
         super({ ...options, name: 'bosch-homecom' });
-        this.pollTimer = null;
-        this.refreshTimer = null;
         this.pkceVerifier = null;
         this.on('ready', this.onReady.bind(this));
         this.on('stateChange', this.onStateChange.bind(this));
@@ -56,8 +54,9 @@ class BoschHomecom extends utils.Adapter {
         try {
             if (fs.existsSync(TOKEN_FILE)) {
                 const data = JSON.parse(fs.readFileSync(TOKEN_FILE, 'utf8'));
-                if (data.accessToken && data.refreshToken)
+                if (data.accessToken && data.refreshToken) {
                     return data;
+                }
             }
         }
         catch (err) {
@@ -100,7 +99,7 @@ class BoschHomecom extends utils.Adapter {
         var _a, _b;
         try {
             const config = this.config;
-            const pollMs = (((_a = config.pollInterval) !== null && _a !== void 0 ? _a : 300)) * 1000;
+            const pollMs = ((_a = config.pollInterval) !== null && _a !== void 0 ? _a : 300) * 1000;
             this.log.info('[API] Connecting to Bosch cloud...');
             const gateways = await this.api.getGateways();
             if (gateways.length === 0) {
@@ -112,16 +111,20 @@ class BoschHomecom extends utils.Adapter {
             }
             await this.setStateAsync('info.connection', { val: true, ack: true });
             this.log.info(`[Adapter] Connected. Polling every ${(_b = config.pollInterval) !== null && _b !== void 0 ? _b : 300}s.`);
-            this.pollTimer = setInterval(() => this.poll(), pollMs);
+            this.pollTimer = this.setInterval(() => {
+                void this.poll();
+            }, pollMs);
             // Proactive token refresh every 12h
-            this.refreshTimer = setInterval(async () => {
-                try {
-                    await this.auth.refreshTokens();
-                }
-                catch (err) {
-                    this.log.error(`[Auth] Proactive refresh failed: ${err}`);
-                    await this.setStateAsync('info.connection', { val: false, ack: true });
-                }
+            this.refreshTimer = this.setInterval(() => {
+                void (async () => {
+                    try {
+                        await this.auth.refreshTokens();
+                    }
+                    catch (err) {
+                        this.log.error(`[Auth] Proactive refresh failed: ${err}`);
+                        await this.setStateAsync('info.connection', { val: false, ack: true });
+                    }
+                })();
             }, 12 * 60 * 60 * 1000);
         }
         catch (err) {
@@ -142,8 +145,9 @@ class BoschHomecom extends utils.Adapter {
     }
     // ─── State changes ───────────────────────────────────────────────────────
     async onStateChange(id, state) {
-        if (!state || state.ack)
+        if (!state || state.ack) {
             return;
+        }
         try {
             await this.deviceManager.writeState(id, state.val);
             await this.setStateAsync(id, { val: state.val, ack: true });
@@ -155,13 +159,15 @@ class BoschHomecom extends utils.Adapter {
     // ─── Messages from admin UI ──────────────────────────────────────────────
     async onMessage(obj) {
         var _a, _b;
-        if (!(obj === null || obj === void 0 ? void 0 : obj.command))
+        if (!(obj === null || obj === void 0 ? void 0 : obj.command)) {
             return;
+        }
         switch (obj.command) {
             case 'storeVerifier': {
                 const v = (_a = obj.message) === null || _a === void 0 ? void 0 : _a.verifier;
-                if (v)
+                if (v) {
                     this.pkceVerifier = v;
+                }
                 this.sendTo(obj.from, obj.command, { ok: true }, obj.callback);
                 break;
             }
@@ -179,12 +185,12 @@ class BoschHomecom extends utils.Adapter {
                     this.log.info('[Auth] Login successful via admin UI.');
                     this.sendTo(obj.from, obj.command, { success: true }, obj.callback);
                     if (this.pollTimer) {
-                        clearInterval(this.pollTimer);
-                        this.pollTimer = null;
+                        this.clearInterval(this.pollTimer);
+                        this.pollTimer = undefined;
                     }
                     if (this.refreshTimer) {
-                        clearInterval(this.refreshTimer);
-                        this.refreshTimer = null;
+                        this.clearInterval(this.refreshTimer);
+                        this.refreshTimer = undefined;
                     }
                     await this.connect();
                 }
@@ -196,23 +202,34 @@ class BoschHomecom extends utils.Adapter {
             case 'testConnection': {
                 try {
                     const gateways = await this.api.getGateways();
-                    this.sendTo(obj.from, obj.command, { success: true, gatewayCount: gateways.length }, obj.callback);
+                    this.sendTo(obj.from, obj.command, {
+                        success: true,
+                        gatewayCount: gateways.length
+                    }, obj.callback);
                 }
                 catch (err) {
-                    this.sendTo(obj.from, obj.command, { success: false, error: String(err) }, obj.callback);
+                    this.sendTo(obj.from, obj.command, {
+                        success: false,
+                        error: String(err)
+                    }, obj.callback);
                 }
                 break;
             }
-            default:
+            default: {
                 this.log.warn(`[Adapter] Unknown message: ${obj.command}`);
+            }
         }
     }
     // ─── Cleanup ─────────────────────────────────────────────────────────────
     onUnload(callback) {
-        if (this.pollTimer)
-            clearInterval(this.pollTimer);
-        if (this.refreshTimer)
-            clearInterval(this.refreshTimer);
+        if (this.pollTimer) {
+            this.clearInterval(this.pollTimer);
+            this.pollTimer = undefined;
+        }
+        if (this.refreshTimer) {
+            this.clearInterval(this.refreshTimer);
+            this.refreshTimer = undefined;
+        }
         callback();
     }
 }
